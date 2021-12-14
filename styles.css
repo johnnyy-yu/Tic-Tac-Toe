@@ -1,0 +1,10 @@
+.boxes {
+    padding: 10px;
+    border: 1px solid black;
+}
+
+.row0,
+.row1,
+.row2 {
+    display: flex;
+}
