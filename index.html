@@ -4,17 +4,35 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Tic-Tac-Toe</title>
     <link rel="stylesheet" href="./styles.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Nunito">
+    <link rel="shortcut icon" href="./tic-tac-toe-icon-free-of-game-icons-411211.png" type="image/x-icon">
+    <style>
+        * {
+            font-family: "Nunito", serif;
+        }
+    </style>
 </head>
 <body>
-    <header>Tic Tac Toe</header>
+    <header>
+        <img src="./tic-tac-toe-icon-free-of-game-icons-411211.png" alt="">
+        Tic Tac Toe</header>
     <main>
-        <div class="board"></div>
-        <div class="display"></div>
-        <button class="reset">Reset</button>
+        <div class="board-wrapper">
+            <div class="board"></div>
+        </div>
+        <div class="display-wrapper">
+            <div class="display"></div>
+            <button class="reset">Reset</button>
+        </div>
     </main>
-    
+    <footer>
+        Made by Jylx
+        <a class="github" href= "https://github.com/jylx-x/Tic-Tac-Toe">
+            <img id="icon" src="./GitHub-Mark-32px.png">
+        </a>
+    </footer>
 </body>
 <script src="./script.js"></script>
 </html>

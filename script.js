@@ -55,10 +55,12 @@ const gameBoard = (() => {
     };
 
     const resetBoard = () => {
-        _cleanBoard();
-        _resetBoardArray();
-        game.resetGame();
-        display.beginMessage();
+        if (players.playerOne.name !== "") {
+            _cleanBoard();
+            _resetBoardArray();
+            game.resetGame();
+            display.beginMessage();
+        }
     };
 
     return {
@@ -114,6 +116,12 @@ const game = (() => {
         const player1Win = (value) => value === "X";
         const player2Win = (value) => value === "O";
 
+        const _tie = (() => {
+            if (!array.includes("")) {
+                display.displayText("Tie Game! Go Again!")
+            }
+        })();
+
         const _rows = (() => {
             const row1 = array.slice(0, 3);
             const row2 = array.slice(3, 6);
@@ -152,12 +160,6 @@ const game = (() => {
 
             if (diagonal1.every(player2Win) || diagonal2.every(player2Win)) {
                 display.displayText(winnerPlayerTwo);
-            }
-        })();
-
-        const _tie = (() => {
-            if (!array.includes("")) {
-                display.displayText("Tie Game! Go Again!")
             }
         })();
     }
