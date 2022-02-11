@@ -1,53 +1,45 @@
+window.onload = () => {
+    document.querySelector("input").focus();
+    document.querySelector(".reset").addEventListener("click", gameBoard.resetBoard)
+};
+
 const gameBoard = (() => {
-    let boardArray = ["","","","","","","","",""];
+    let boardArray = new Array(9).fill("");
 
     const _create = (() => {
         let board = document.querySelector(".board");
-        let i = 0;
     
-        for (let row = 0; row < 3; row++) {
-            let div = document.createElement("div");
-            div.className = "row" + row;
-            for (let boxes = 0; boxes < 3; boxes++) {
-                let box = document.createElement("div")
-                box.className = "boxes"
-                box.id = i;
-                box.textContent = boardArray[i];
-                div.appendChild(box);
-                i++;
-            }
-            board.appendChild(div);
+        for (let i = 0; i < 9; i++) {
+            const boxes = document.createElement("div");
+            boxes.className = "boxes"
+            boxes.id = i;
+            boxes.textContent = boardArray[i];
+            board.appendChild(boxes);
         }
     })();
 
-    const _addClickEvent = (() => {
+    const addClickEvent = () => {
         let allBoxes = document.querySelectorAll(".boxes");
-        console.log(allBoxes)
     
         for (const boxes of allBoxes) {
             boxes.addEventListener("click", (event) => {
-                _appendBoardArray(event.target.id);
-                _updateBoard(event.target.id);
-                game.winConditions(boardArray);
+                if (!boxes.textContent) {
+                    _updateBoardArray(event.target.id);
+                    _updateBoard(event.target.id);
+                    game.nextTurn()
+                    game.winConditions(boardArray);
+                }
             })
         }
-    })();
-    
-    const _appendBoardArray = (ArrayIndex) => {
-        if (boardArray[ArrayIndex]) {
-            _warning();
-        } else {
-            boardArray[ArrayIndex] = game.currentMove();
-            console.log(boardArray);
-        }
     };
-
-    const _warning = () => {
-        window.alert("This spot is taken! Try again!")
+    
+    const _updateBoardArray = (ArrayIndex) => {
+        boardArray[ArrayIndex] = game.currentSign();
+        console.log(boardArray);
     };
 
     const _updateBoard = (boxID) => {
-        document.getElementById(boxID).textContent = boardArray[boxID];
+        document.getElementById(boxID).textContent = game.currentSign();
     };
 
     const _cleanBoard = () => {
@@ -59,92 +51,171 @@ const gameBoard = (() => {
     };
 
     const _resetBoardArray = () => {
-        boardArray = ["","","","","","","","",""];
+        boardArray = new Array(9).fill("");
     };
 
     const resetBoard = () => {
         _cleanBoard();
         _resetBoardArray();
+        game.resetGame();
+        display.beginMessage();
     };
 
     return {
         boardArray,
+        addClickEvent,
         resetBoard,
     };
 })();
 
-const player = (() => {
-    let playerOneName = "";
-    const playerOneSign = "X";
+const players = (() => {
+    const playerOne = (() => {
+        let name = "";
+        const sign = "X"
 
-    let playerTwoName = ""
-    const playerTwoSign = "O";
+        return {name, sign}
+    })();
+
+    const playerTwo = (() => {
+        let name = "";
+        const sign = "O"
+
+        return {name, sign}
+    })();
 
     return {
-        playerOneSign,
-        playerTwoSign
+        playerOne,
+        playerTwo,
     }
 })();
 
 const game = (() => {
-    let _currentTurn = "playerOne";
+    let currentTurn = players.playerOne;
 
-    const _nextTurn = () => {
-        if (_currentTurn == "playerOne") {
-            _currentTurn = "playerTwo";
+    const resetGame = () => {
+        currentTurn = players.playerOne
+    }
+
+    const nextTurn = () => {
+        if (currentTurn == players.playerOne) {
+            currentTurn = players.playerTwo;
         } else {
-            _currentTurn = "playerOne";
+            currentTurn = players.playerOne;
         }
     };
 
-    const currentMove = () => {
-        if (_currentTurn == "playerOne") {
-            _nextTurn();
-            return player.playerOneSign;
-        } else {
-            _nextTurn();
-            return player.playerTwoSign;
-        }
+    const currentSign = () => {
+        return currentTurn.sign
     };
 
     const winConditions = (array) => {
-        if (array[0] == array[1] && array[1] == array[2] && array[1] != "") {
-            if (array[1] == "X") {
-                return window.alert(player.playerOneName +  "has won!");
-            } else {
-                return player.playerTwoName + "has won!";
+        let winnerPlayerOne = players.playerOne.name +  " has won!";
+        let winnerPlayerTwo = players.playerTwo.name +  " has won!";
+        const player1Win = (value) => value === "X";
+        const player2Win = (value) => value === "O";
+
+        const _rows = (() => {
+            const row1 = array.slice(0, 3);
+            const row2 = array.slice(3, 6);
+            const row3 = array.slice(6);
+
+            if (row1.every(player1Win) || row2.every(player1Win) || row3.every(player1Win)) {
+                display.displayText(winnerPlayerOne);
             }
-        } else if (array[3] == array[4] && array[4] == array[5] && array[4] != "") {
-            if (array[4] == "X") {
-                return player.playerOneName +  "has won!";
-            } else {
-                return player.playerTwoName + "has won!";
+
+            if (row1.every(player2Win) || row2.every(player2Win) || row3.every(player2Win)) {
+                display.displayText(winnerPlayerTwo);
             }
-        } else if (array[6] == array[7] && array[7] == array[8] && array[7] != "") {
-            if (array[7] == "X") {
-                return player.playerOneName +  "has won!";
-            } else {
-                return player.playerTwoName + "has won!";
+        })();
+
+        const _columns = (() => {
+            const column1 = [array[0], array[3], array[6]];
+            const column2 = [array[1], array[4], array[7]];
+            const column3 = [array[2], array[5], array[8]];
+
+            if (column1.every(player1Win) || column2.every(player1Win) || column3.every(player1Win)) {
+                display.displayText(winnerPlayerOne);
+            };
+
+            if (column1.every(player2Win) || column2.every(player2Win) || column3.every(player2Win)) {
+                display.displayText(winnerPlayerTwo);
+            };
+        })();
+
+        const _diagonals = (() => {
+            const diagonal1 = [array[0], array[4], array[8]];
+            const diagonal2 = [array[2], array[4], array[6]];
+
+            if (diagonal1.every(player1Win) || diagonal2.every(player1Win)) {
+                display.displayText(winnerPlayerOne);
             }
-        } else if (array[0] == array[4] && array[4] == array[8] && array[4] != "") {
-            if (array[4] == "X") {
-                return player.playerOneName +  "has won!";
-            } else {
-                return player.playerTwoName + "has won!";
+
+            if (diagonal1.every(player2Win) || diagonal2.every(player2Win)) {
+                display.displayText(winnerPlayerTwo);
             }
-        } else if (array[2] == array[4] && array[4] == array[6] && array[4] != "") {
-            if (array[4] == "X") {
-                return player.playerOneName +  "has won!";
-            } else {
-                return player.playerTwoName + "has won!";
+        })();
+
+        const _tie = (() => {
+            if (!array.includes("")) {
+                display.displayText("Tie Game! Go Again!")
             }
-        } else if (!array.includes("")) {
-            return "Tie Game!"
-        }
+        })();
     }
 
     return {
-        currentMove,
+        resetGame,
+        nextTurn,
+        currentSign,
         winConditions
     };
+})();
+
+const display = (() => {
+    const displayContainer = document.querySelector(".display");
+
+    const _getPlayerNames = (() => {
+        const playerOne = (() => {
+            const input = document.createElement("input")
+            displayContainer.innerText = "Player 1, please enter your name:";
+            input.type = "text";
+            input.addEventListener("keyup", (e) => {
+                if (e.key === "Enter") {
+                    players.playerOne.name = input.value
+                    _clearDisplay();
+                    playerTwo();
+                }
+            })
+            displayContainer.appendChild(input);
+        })();
+
+        const playerTwo = () => {
+            const input = document.createElement("input")
+            displayContainer.innerText = "Player 2, please enter your name:";
+            input.type = "text";
+            input.autofocus = true;
+            input.addEventListener("keyup", (e) => {
+                if (e.key === "Enter") {
+                    players.playerTwo.name = input.value
+                    _clearDisplay();
+                    beginMessage();
+                    gameBoard.addClickEvent();
+                }
+            })
+            displayContainer.appendChild(input);
+        }
+    })();
+
+    const beginMessage = () => {
+        displayContainer.innerText = "Begin!"
+    }
+
+    const displayText = (text) => {
+        displayContainer.innerText = text;
+    }
+
+    const _clearDisplay = () => {
+        displayContainer.innerText = "";
+    }
+
+    return {beginMessage, displayText}
 })();
